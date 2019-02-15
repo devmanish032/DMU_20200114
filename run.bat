@@ -1,0 +1,1 @@
+java -jar CIPAserver.jar > out.txt
