@@ -89,7 +89,7 @@ public class DatePickerCalendar extends JDialog implements ItemListener,
             BorderFactory.createLineBorder(Color.yellow, 1);
     /** First year that can be selected. */
     static Calendar calendars = Calendar.getInstance();
-    private static final int FIRST_YEAR = 1980;
+    private static final int FIRST_YEAR = 1990;
     /** Last year that can be selected. */
     private static final int LAST_YEAR = calendars.get(Calendar.YEAR);
     /** Auxiliary variable to compute dates. */

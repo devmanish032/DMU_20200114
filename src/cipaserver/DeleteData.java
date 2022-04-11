@@ -31,7 +31,7 @@ public class DeleteData {
             if (!(dmd.getDatabaseProductName().toString()).contains("Microsoft".toString())) {
                 //For MySql
                 prefixStagging = "";
-                prefixTempDB = "";
+                prefixTempDB = "CIPATemp_DB.";
             } else {
                 //For MSSQL
                 prefixStagging = "";
@@ -45,7 +45,7 @@ public class DeleteData {
 
     public void executeDeleteBlock() {
 
-        String strDelete[] = new String[53];
+        String strDelete[] = new String[61];
         strDelete[0] = "delete FROM " + prefixTempDB + "t015_psstaffcurr".toLowerCase();
         strDelete[1] = "delete from " + prefixTempDB + "t014_policestationbeat".toLowerCase();
         strDelete[2] = "delete from " + prefixTempDB + "t1_registration".toLowerCase();
@@ -99,8 +99,17 @@ public class DeleteData {
         strDelete[50] = "delete FROM " + prefixTempDB + "t5033_holdings".toLowerCase();
         strDelete[51] = "delete FROM " + prefixTempDB + "t5035_training".toLowerCase();
         strDelete[52] = "delete FROM " + prefixTempDB + "t5036_hideouts".toLowerCase();
-
-
+        strDelete[53] = "delete FROM " + prefixTempDB + "t099_generaldiary".toLowerCase();
+        strDelete[54] = "delete FROM " + prefixTempDB + "t3_caseprogress".toLowerCase();
+        strDelete[55] = "delete FROM " + prefixTempDB + "t304b_seizure".toLowerCase();
+        strDelete[56] = "delete FROM " + prefixTempDB + "t2012_properties".toLowerCase();
+        strDelete[57] = "delete FROM " + prefixTempDB + "t015_psstaffold".toLowerCase();
+        strDelete[58] = "delete FROM " + prefixTempDB + "t011_state".toLowerCase();
+        strDelete[59] = "delete FROM " + prefixTempDB + "t012_district".toLowerCase();
+        strDelete[60] = "delete FROM " + prefixTempDB + "t013_policestation".toLowerCase();
+//        strDelete[61] = "delete FROM " + prefixTempDB + "t5013_cristatus".toLowerCase();        
+        
+        
         PreparedStatement pstmtDelete;
         sourceORtarget = "target";
         SQLConnection sqlcon = new SQLConnection();

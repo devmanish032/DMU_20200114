@@ -60,7 +60,7 @@ public class CIPAServerMain extends JFrame {
     final String[] labelContents = new String[]{"", "User Name :- ", "Password :- ", "Hostname/IP address :-", "Database Name :-", "Database Type :-", "Operating System :-"};
     final String[] DatabaseNamesSource = new String[]{"", "PostgreSQL"};
     final String[] DatabaseNamesTarget = new String[]{"", "MySql", "SQL Server",};
-    final String[] OSystemNamesSource = new String[]{"", "Linux"};
+    final String[] OSystemNamesSource = new String[]{"", "Windows", "Linux"};
     final String[] OSystemNamesTarget = new String[]{"", "Windows", "Linux"};
     JTextField sourcePortTextField = new JTextField();
     JTextField targetPortTextField = new JTextField();
@@ -107,7 +107,7 @@ public class CIPAServerMain extends JFrame {
      */
     File fileSequel;
     public boolean leftConOk, rightConOk;
-    JLabel labelState, labelDistrict, labelPS, labelFromDate, labelToDate, labelSaveAt, labeluploadFrom;
+    JLabel labelState, labelDistrict, labelPS, labelFromDate, labelToDate, labelSaveAt, labeluploadFrom,labelStatus;
     JComboBox comboState, comboDistrict, comboPS;    //adding checking
     String selectedState, selectedDistrict, selectedPS;
     Object keyState, keyDistrict, keyPS;
@@ -228,7 +228,7 @@ public class CIPAServerMain extends JFrame {
 
 //--LOWER PANEL CONTENTS--------------------------------------------------------
         WindowLowerPanel.setLayout(null);
-
+        labelStatus= new JLabel("");
         labelState = new JLabel("State                 :");
         comboState = new JComboBox();
 
@@ -270,7 +270,7 @@ public class CIPAServerMain extends JFrame {
         toCalander = new JButton(new ImageIcon("src/i_cal.gif"));
         browseSaveAtButton = new JButton("Browse");
         browseSelectFromButton = new JButton("Browse");
-
+        WindowLowerPanel.add(labelStatus);
         WindowLowerPanel.add(labelState);
         WindowLowerPanel.add(labelDistrict);
         WindowLowerPanel.add(labelPS);
@@ -306,6 +306,7 @@ public class CIPAServerMain extends JFrame {
         labelSaveAt.setVisible(false);
         labeluploadFrom.setVisible(false);
         labelToDate.setVisible(false);
+        labelStatus.setVisible(false);
         labelState.setVisible(false);
         labelDistrict.setVisible(false);
         labelPS.setVisible(false);
@@ -322,7 +323,7 @@ public class CIPAServerMain extends JFrame {
         textFieldUploadFrom.setVisible(false);
         browseSelectFromButton.setVisible(false);
         statusLabel.setVisible(false);
-
+labelStatus.setBounds(10, 12, 100, 20);
         labelState.setBounds(10, 32, 100, 20);
         labelDistrict.setBounds(10, 54, 100, 20);
         labelPS.setBounds(10, 76, 100, 20);
@@ -1032,8 +1033,6 @@ public class CIPAServerMain extends JFrame {
                                 //-READ FROM PROPERTY FILE TO DISPLAY CON DETAILS---------------
                                 props = new Properties();
 
-
-
                                 try {
                                     File tofolder = new File(System.getProperty("user.dir"));
                                     File propFile = new File(tofolder + "/ServerConnection.properties");
@@ -1365,6 +1364,13 @@ public class CIPAServerMain extends JFrame {
                                 if (alreadyRun == true) {
                                     JOptionPane.showMessageDialog(comp, "Can't Go Ahead!!!\n\nFor the same selection\nthe data has already been\ntransfered successfully.");
                                 } else {
+                                    System.out.println("\n\nData Migration utility started ............");
+                                    File file=new File("Logs");
+                                    try {
+                                        file.mkdir();
+                                    } catch (Exception fe) {
+                                         System.out.println(fe.toString());                                        
+                                    }
                                     pb.setVisible(true);
                                     Calendar date = Calendar.getInstance();
                                     SimpleDateFormat dateformatter = new SimpleDateFormat("yyyyMMddhhmmss");
@@ -1372,9 +1378,12 @@ public class CIPAServerMain extends JFrame {
 
                                     batchCD = "CIPA_" + keyState.toString().trim() + keyDistrict.toString().trim() + keyPS.toString().trim() + "_" + textFieldFromDate.getText().trim() + "_" + datestr.trim();
 //                                    System.out.println(batchCD);
+                                    System.out.println("\n\nStep 1: Checking failed data ............");
 
                                     ArrayList statusR = processSP.checkStatusR();//Checking failed data...
+                                    System.out.println("\n\nStep 2: Removing failed data (if any) ............");
                                     if (statusR.size() != 0) {
+                                        
                                         processSP.runForStatusR(statusR);//Removing failed data...
 
                                     }
@@ -1404,6 +1413,7 @@ public class CIPAServerMain extends JFrame {
 
                                     }
                                     //========
+                                    labelStatus.setText("Insertion is in process.......");
                                     String str = "Insertion is in process.......";
                                     statusLabel.setText(str);
                                     statusLabel.setVisible(true);
@@ -1412,7 +1422,8 @@ public class CIPAServerMain extends JFrame {
                                     pb.setVisible(true);
                                     statusLabel.setVisible(false);
                                     //========
-
+                                    labelStatus.setText("Step 3: Preparing CipaTemp_DB database ............");
+                                    System.out.println("\n\nStep 3: Preparing CipaTemp_DB database ............");
                                     //-Deletions----------------------------------------
                                     DeleteData deleteData = new DeleteData();
                                     deleteData.executeDeleteBlock();
@@ -1425,27 +1436,38 @@ public class CIPAServerMain extends JFrame {
                                     migrate.setSelections(selections);
                                     String string[] = null;
                                     try {
-                                        System.out.println("selectQueries"+selectQueries);
+                                        labelStatus.setText("Step 4: Copying data from CIPA to CipaTemp_DB ............");
+                                        System.out.println("\n\nStep 4: Copying data from CIPA to CipaTemp_DB ............");
                                         string = migrate.executeInsertsBlock(selectQueries, batchCD);
                                     } catch (Exception ex) {
 //                                        ex.printStackTrace();
                                         logger.log(CctnsLogger.ERROR, e);
-
                                     }
                                     //calling Stored Procedures-------------------------
+                                    labelStatus.setText("Step 5: Moving data from CipaTemp_DB to Stagging_DB using procedure SP_from_CIPAtempDB_TO_Stagging ............");
+                                    System.out.println("\nStep 5: Moving data from CipaTemp_DB to Stagging_DB using procedure SP_from_CIPAtempDB_TO_Stagging ............");
                                     processSP.SP_from_CIPAtempDB_TO_Stagging(batchCD, string);//SP_Load_CIPA_Data
-
+                                    labelStatus.setText("Step 6: Migrating data from Staging_DB to cctns_state_db ...........");
+                                    System.out.println("\nStep 6: Migrating data from Staging_DB to cctns_state_db ...........");
                                     processSP.callAllStoredProcedures(batchCD);
-                                    processSP.callCheckSum(batchCD);
+                                    //System.out.println("\n\nStep 4: Verifying checksum values for migrated data ............");
+                                    //processSP.callCheckSum(batchCD);
                                     // call SpChecksum_Landing_to_Target with batchcd
                                     //---------------------------------------------------
                                     try {
                                         String filename = null;
+                                        System.out.println("\nStep 7: Verifying records after migration ............");
                                         processSP.CALL_SP_Table_Record_Count(filename, batchCD, location, datestr, string);//Finalizing process...
-                                        JOptionPane.showMessageDialog(content, "Data Migrated Successfully!!!" + "\n" + " Please see the generated LOG File " + "\n" + " for complete Status");
+                                        System.out.println("\nData migration completed ............");
+                                        JOptionPane.showMessageDialog(content, "Data Migrated Successfully!!!" + "\n\n" + "Please see the generated LOG File for complete Status.");
                                         pb.setVisible(false);
-                                    } catch (Exception ee) {
+                                       System.exit(0);
+                                    } 
+                                    catch (Exception ee) {
                                         logger.log(CctnsLogger.ERROR, ee);
+                                        System.out.println("\n\nData migration did not completed because of errors ............"); 
+                                        JOptionPane.showMessageDialog(content, "Data Migration Failed .........." + "\n\n" + "Please see the generated LOG File for errors.");
+                                        System.exit(0);
 //                                        ee.printStackTrace();
                                     }
                                 }
@@ -1519,7 +1541,7 @@ public class CIPAServerMain extends JFrame {
 
                             String nameLocation[] = uploadData.executeUploadBlock(withPathfileName);
 
-                            int beginIndex = withPathfileName.lastIndexOf(System.getProperty("file.separator")) + 1; //changed to accomodate file system path for Linux
+                            int beginIndex = withPathfileName.lastIndexOf("\\") + 1;
                             int endIndex = withPathfileName.indexOf('.');
                             String fileName = withPathfileName.substring(beginIndex, endIndex);
 
@@ -1539,8 +1561,8 @@ public class CIPAServerMain extends JFrame {
                             ArrayList YYMMarrayList = processSP.rangeFromToYYYYMM(from, to);
 
                             //added by Vikas
-                            //JOptionPane.showMessageDialog(comp, "Data moved to tempd db,!!!\n\nProgram will exit now.");
-                            //System.exit(0);
+                            JOptionPane.showMessageDialog(comp, "Data moved to tempd db,!!!\n\nProgram will exit now.");
+                            System.exit(0);
                             //added by Vikas
                             boolean alreadyRun = processSP.checkDuplicateUpload(YYMMarrayList);//Checking previous run for same...
                             if (alreadyRun == true) {
@@ -1655,6 +1677,7 @@ public class CIPAServerMain extends JFrame {
 
         labelFromDate.setVisible(true);
         labelToDate.setVisible(true);
+        labelStatus.setVisible(true);
         labelState.setVisible(true);
         labelDistrict.setVisible(true);
         labelPS.setVisible(true);
@@ -1682,6 +1705,7 @@ public class CIPAServerMain extends JFrame {
 
         labelFromDate.setVisible(false);
         labelToDate.setVisible(false);
+        labelStatus.setVisible(true);
         labelState.setVisible(false);
         labelDistrict.setVisible(false);
         labelPS.setVisible(false);
@@ -1711,6 +1735,7 @@ public class CIPAServerMain extends JFrame {
 
         labelFromDate.setVisible(true);
         labelToDate.setVisible(true);
+        labelStatus.setVisible(true);
         labelState.setVisible(true);
         labelDistrict.setVisible(true);
         labelPS.setVisible(true);

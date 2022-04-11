@@ -212,7 +212,7 @@ public class DownloadData {
 
                         switch (jk) {
                             case 0:
-                                insertString = "INSERT INTO " + prefixTempDB + "t015_psstaffcurr (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ");";
+                                insertString = "INSERT INTO " + prefixTempDB + "t015_psstaffcurr (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                 insertingTable = "t015_psstaffcurr";
                                 break;
                             case 1:

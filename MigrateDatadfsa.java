@@ -656,6 +656,46 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
+                                case 53:
+                                    insertString = "insert into " + prefixTempDB + "t099_generaldiary (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t099_generaldiary";
+                                    respective_Reg_Field = "gd_srno";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                case 54:
+                                    insertString = "insert into " + prefixTempDB + "t3_caseprogress (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t3_caseprogress";
+                                    respective_Reg_Field = "regn_srno";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                case 55:
+                                    insertString = "insert into " + prefixTempDB + "t304b_seizure (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t304b_seizure";
+                                    respective_Reg_Field = "regn_srno";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                case 56:
+                                    insertString = "insert into " + prefixTempDB + "t2012_properties (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t2012_properties";
+                                    respective_Reg_Field = "regn_srno";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                case 57:
+                                    insertString = "insert into " + prefixTempDB + "t015_psstaffold (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t015_psstaffold";
+                                    respective_Reg_Field = "pis_code";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
                             }
 
                             insertingTables[jk] = insertingTable
@@ -703,8 +743,8 @@ public class MigrateData {
     public String chekUpdate(String string) throws UnsupportedEncodingException {
         String sOut = string;
 //        System.out.println("calling update...................");
-        if (string.contains("½")) {
-            sOut = sOut.replaceAll("½", ".5");
+        if (string.contains("Â½")) {
+            sOut = sOut.replaceAll("Â½", ".5");
         }
 
         //char chara[] = string.toCharArray();
@@ -833,50 +873,50 @@ public class MigrateData {
             sOut1 = string;
         }
 
-        if (sOut1.contains("½")) {
-            sOut2 = sOut1.replaceAll("½", "1/2");
+        if (sOut1.contains("Â½")) {
+            sOut2 = sOut1.replaceAll("Â½", "1/2");
         } else {
             sOut2 = sOut1;
         }
 
-        if (sOut2.contains("“")) {
-            sOut3 = sOut2.replaceAll("“", " ");
+        if (sOut2.contains("â€œ")) {
+            sOut3 = sOut2.replaceAll("â€œ", " ");
         } else {
             sOut3 = sOut2;
         }
 
-        if (sOut3.contains("–")) {
-            sOut4 = sOut3.replaceAll("–", "-");
+        if (sOut3.contains("â€“")) {
+            sOut4 = sOut3.replaceAll("â€“", "-");
         } else {
             sOut4 = sOut3;
         }
 
-        if (sOut4.contains("”")) {
-            sOut5 = sOut4.replaceAll("”", " ");
+        if (sOut4.contains("â€�")) {
+            sOut5 = sOut4.replaceAll("â€�", " ");
         } else {
             sOut5 = sOut4;
         }
 
-        if (sOut5.contains("®")) {
-            sOut6 = sOut5.replaceAll("®", "(R)");
+        if (sOut5.contains("Â®")) {
+            sOut6 = sOut5.replaceAll("Â®", "(R)");
         } else {
             sOut6 = sOut5;
         }
 
-        if (sOut6.contains("©")) {
-            sOut7 = sOut6.replaceAll("©", "(C)");
+        if (sOut6.contains("Â©")) {
+            sOut7 = sOut6.replaceAll("Â©", "(C)");
         } else {
             sOut7 = sOut6;
         }
 
-        if (sOut7.contains("– ")) {
-            sOut8 = sOut7.replaceAll("– ", "-");
+        if (sOut7.contains("â€“ ")) {
+            sOut8 = sOut7.replaceAll("â€“ ", "-");
         } else {
             sOut8 = sOut7;
         }
 
-        if (sOut8.contains("—")) {
-            sOut9 = sOut8.replaceAll("—", "-");
+        if (sOut8.contains("â€”")) {
+            sOut9 = sOut8.replaceAll("â€”", "-");
         } else {
             sOut9 = sOut8;
         }

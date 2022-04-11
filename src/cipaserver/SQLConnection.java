@@ -44,14 +44,18 @@ public class SQLConnection {
             System.out.println(">>>"+urlData1);
             connection = DriverManager.getConnection(urlData1, str[0].toString(), str[1].toString());
 
-        } else if (str[5].contains("Windows") && str[4].toString().equals("SQL Server")) {
+        } else if (str[5].toString().equals("Windows") && str[4].toString().equals("MySql")) {
+            Class.forName("com.mysql.jdbc.Driver");
+            String urlData1 = "jdbc:mysql://" + (str[2]).toString().trim() + ":" + str[6] + "/" + (str[3]).toString().trim() + "?useUnicode=true&characterEncoding=utf8";//+"?characterEncoding=utf8&useUnicode=true&useCursorFetch=true&defaultFetchSize=1000";//?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8";
+            //getConnection(  "jdbc:mysql://localhost:3306/cctns_kochi?useUnicode=true&characterEncoding=utf8&user=root&password=abcd");?useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8
+            System.out.println(">>>"+urlData1);
+            connection = DriverManager.getConnection(urlData1, str[0].toString(), str[1].toString());
+
+        } 
+        else if (str[5].contains("Windows") && str[4].toString().equals("SQL Server")) {
             // System.out.println(str[0]);
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-            //String urlData2 = "jdbc:sqlserver://" + (str[2]).toString().trim() + ";databaseName=" + (str[3]).toString().trim();
-            String urlData2 = "jdbc:sqlserver://" + (str[2]).toString().trim() + ";databaseName=" + (str[3]).toString().trim() + ";CharacterSet=UTF-8";
-            //String urlData2 = "jdbc:sqlserver://" + (str[2]).toString().trim() + ";databaseName=" + (str[3]).toString().trim() + ";useUnicode=true;characterEncoding=utf8";
-            
-           
+            String urlData2 = "jdbc:sqlserver://" + (str[2]).toString().trim() + ";databaseName=" + (str[3]).toString().trim();
 //                System.out.println(urlData2);
 //                System.out.println("static: "+"jdbc:sqlserver://dvstdbwn01\\mssqlservercctns;databaseName=stagging");
 //                System.out.println(str[2].toString()+""+ str[3].toString());
@@ -184,7 +188,12 @@ public class SQLConnection {
                 Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
                 String urlData2 = "jdbc:sqlserver://" + ipaddress + ";databaseName=" + databasename;
                 connection = DriverManager.getConnection(urlData2, username, password);
-            } else {
+            }else if (opertingsystem.equals("Windows") && databasetype.equals("MySql")) {
+                Class.forName("com.mysql.jdbc.Driver");
+                String urlData1 = "jdbc:mysql://" + ipaddress + ":" + port + "/" + databasename;
+                connection = DriverManager.getConnection(urlData1, username, password);
+            }
+            else {
                 Class.forName("org.postgresql.Driver");
                 //"jdbc:postgresql://localhost/cipa","postgres", "administrator"
                 String urlData2 = "jdbc:postgresql://" + ipaddress + ":" + port + "/" + databasename;

@@ -51,7 +51,6 @@ public class MigrateData {
     private static CctnsLogger logger = CctnsLogger.getInstance(MigrateData.class.getName());
 
     public MigrateData() {
-        
         java.sql.DatabaseMetaData dmd = null;
         try {
             sourceORtarget = "target";
@@ -64,7 +63,7 @@ public class MigrateData {
                 prefixTempDB = "CIPATemp_DB.";
             } else {
                 //For MSSQL
-                prefixStagging = "";
+                prefixStagging = "cipa_staging";
                 prefixTempDB = "CIPATemp_DB.dbo.";
             }
         } catch (Exception e) {
@@ -145,7 +144,8 @@ public class MigrateData {
             HashMap hm = new HashMap();
             HashMap getRejectHM = new HashMap();
 
-            try {
+lbl_Next_Statement:  
+        try {
                 pstmtMetaSelect = connectionSource.prepareStatement(selectStringSql[jk].toString());
                 ResultSetMetaData rsetMetaSelect = pstmtMetaSelect.getMetaData();
 //                System.out.println("Query" + selectStringSql[jk].toString());
@@ -166,7 +166,6 @@ public class MigrateData {
                     while (rsetSelect.next()) {
                         try {
                             buffterValue = new StringBuffer();
-                            //System.out.println("rsetMetaSelect.getColumnCount()"+rsetMetaSelect.getColumnCount());
                             for (int ij = 1; ij <= rsetMetaSelect.getColumnCount(); ij++) {
                                 if (insertCounter == 0) {
                                     buffterMeta.append(rsetMetaSelect.getColumnName(ij) + ", ");
@@ -214,17 +213,13 @@ public class MigrateData {
 
                             switch (jk) {
                                 case 0:
-                                    
-                                    //System.out.println("buffterMeta.toString()"+buffterMeta.toString());
                                     insertString = "INSERT INTO " + prefixTempDB + "t015_psstaffcurr (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t015_psstaffcurr";
                                     respective_Reg_Field = "pis_code";
                                     //System.out.println(insertString);
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
-                                    
-                                    break;
-
+                                    break;                                  
                                 case 1:
                                     insertString = "INSERT INTO " + prefixTempDB + "t014_policestationbeat (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t014_policestationbeat";
@@ -232,7 +227,6 @@ public class MigrateData {
                                     //System.out.println(insertString);
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
-                                    buffterMeta.toString().isEmpty();
                                     break;
                                 case 2:
                                     insertString = "INSERT INTO " + prefixTempDB + "t1_registration (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
@@ -250,6 +244,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
+                                    
                                 case 4:
                                     insertString = "insert into  " + prefixTempDB + "t311_transfer (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t311_transfer";
@@ -291,6 +286,15 @@ public class MigrateData {
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
                                 case 9:
+                                    insertString = "insert into " + prefixTempDB + "t102_Person (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t102_Person";
+                                    respective_Reg_Field = "regn_srno";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                
+                                case 10:
                                     insertString = "insert into " + prefixTempDB + "t1021_Personal (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1021_Personal";
                                     respective_Reg_Field = "person_srno";
@@ -298,7 +302,15 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 10:
+                                case 11:
+                                    insertString = "insert into " + prefixTempDB + "t1021_Personal (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t1021_Personal";
+                                    respective_Reg_Field = "person_srno";
+                                    //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                case 12:
                                     insertString = "insert into " + prefixTempDB + "t2013_victim (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t2013_victim";
                                     respective_Reg_Field = "regn_srno";
@@ -306,7 +318,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 11:
+                                case 13:
                                     insertString = "insert into " + prefixTempDB + "t305_witness (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t305_witness";
                                     respective_Reg_Field = "regn_srno";
@@ -314,7 +326,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 12:
+                                case 14:
                                     insertString = "insert into " + prefixTempDB + "t2011_accused (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t2011_accused";
                                     respective_Reg_Field = "regn_srno";
@@ -322,7 +334,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 13:
+                                case 15:
                                     insertString = "INSERT INTO " + prefixTempDB + "t303_arrest (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t303_arrest";
                                     respective_Reg_Field = "regn_srno";
@@ -330,7 +342,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 14:
+                                case 16:
                                     insertString = "insert into " + prefixTempDB + "t10221_physical (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t10221_physical";
                                     respective_Reg_Field = "person_srno";
@@ -338,7 +350,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 15:
+                                case 17:
                                     insertString = "insert into " + prefixTempDB + "t10222_physical (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t10222_physical";
                                     respective_Reg_Field = "person_srno";
@@ -346,7 +358,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 16:
+                                case 18:
                                     insertString = "insert into " + prefixTempDB + "t103_properties (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t103_properties";
                                     respective_Reg_Field = "regn_srno";
@@ -354,7 +366,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 17:
+                                case 19:
                                     insertString = "insert into " + prefixTempDB + "t1031_automobile (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1031_automobile";
                                     respective_Reg_Field = "property_srno";
@@ -362,7 +374,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 18:
+                                case 20:
                                     insertString = "insert into " + prefixTempDB + "t304a_seizure (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t304a_seizure";
                                     respective_Reg_Field = "regn_srno";
@@ -370,7 +382,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 19:
+                                case 21:
                                     insertString = "insert into " + prefixTempDB + "t1034a_currency (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1034a_currency";
                                     respective_Reg_Field = "property_srno";
@@ -378,7 +390,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 20:
+                                case 22:
                                     insertString = "insert into " + prefixTempDB + "t1034b_currency (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1034b_currency";
                                     respective_Reg_Field = "t1034b_currency";
@@ -386,7 +398,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 21:
+                                case 23:
                                     insertString = "insert into " + prefixTempDB + "t1032_cultural (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1032_cultural";
                                     respective_Reg_Field = "property_srno";
@@ -394,7 +406,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 22:
+                                case 24:
                                     insertString = "insert into " + prefixTempDB + "t1035_narcotics (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1035_narcotics";
                                     respective_Reg_Field = "property_srno";
@@ -402,7 +414,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 23:
+                                case 25:
                                     insertString = "insert into " + prefixTempDB + "t1033_numbered (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t1033_numbered";
                                     respective_Reg_Field = "property_srno";
@@ -410,7 +422,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 24:
+                                case 26:
                                     insertString = "insert into " + prefixTempDB + "t312_finalreport (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t312_finalreport";
                                     respective_Reg_Field = "fr_srno";
@@ -418,7 +430,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 25:
+                                case 27:
                                     insertString = "insert into " + prefixTempDB + "t312b_fraccused (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t312b_fraccused";
                                     respective_Reg_Field = "fr_srno";
@@ -426,7 +438,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 26:
+                                case 28:
                                     insertString = "insert into " + prefixTempDB + "t312c_fractsec (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t312c_fractsec";
                                     respective_Reg_Field = "fr_srno";
@@ -434,7 +446,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 27:
+                                case 29:
                                     insertString = "insert into " + prefixTempDB + "t3034_remandcustody (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t3034_remandcustody";
                                     respective_Reg_Field = "arrest_srno";
@@ -442,7 +454,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 28:
+                                case 30:
                                     insertString = "insert into " + prefixTempDB + "t3033_bail (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t3033_bail";
                                     respective_Reg_Field = "regn_srno";
@@ -450,7 +462,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 29:
+                                case 31:
                                     insertString = "insert into " + prefixTempDB + "t406a_courtdisposal (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t406a_courtdisposal";
                                     respective_Reg_Field = "fr_srno";
@@ -458,7 +470,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 30:
+                                case 32:
                                     insertString = "insert into " + prefixTempDB + "t406b_courtdisposal (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t406b_courtdisposal";
                                     respective_Reg_Field = "regn_srno";
@@ -466,7 +478,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 31:
+                                case 33:
                                     insertString = "insert into " + prefixTempDB + "t406c_courtdisposal (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t406c_courtdisposal";
                                     respective_Reg_Field = "fr_srno";
@@ -474,15 +486,15 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 32:
-                                    insertString = "insert into " + prefixTempDB + "t202_missing (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                case 34:
+                                    insertString = "insert into " + prefixTempDB     + "t202_missing (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t202_missing";
                                     respective_Reg_Field = "regn_srno";
                                     //System.out.println(insertString);
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 33:
+                                case 35:
                                     insertString = "insert into " + prefixTempDB + "t205_unnatural (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t205_unnatural";
                                     respective_Reg_Field = "regn_srno";
@@ -490,7 +502,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 34:
+                                case 36:
                                     insertString = "insert into " + prefixTempDB + "t204_mlc (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t204_mlc";
                                     respective_Reg_Field = "regn_srno";
@@ -498,7 +510,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 35:
+                                case 37:
                                     insertString = "insert into " + prefixTempDB + "t207_others (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t207_others";
                                     respective_Reg_Field = "regn_srno";
@@ -506,7 +518,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 36:
+                                case 38:
                                     insertString = "insert into " + prefixTempDB + "t501a_criminal (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t501a_criminal";
                                     respective_Reg_Field = "crim_srno";
@@ -514,7 +526,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 37:
+                                case 39:
                                     insertString = "insert into " + prefixTempDB + "t5011_criaddress (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5011_criaddress";
                                     respective_Reg_Field = "crim_srno";
@@ -522,7 +534,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 38:
+                                case 40:
                                     insertString = "insert into " + prefixTempDB + "t5027_bank (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5027_bank";
                                     respective_Reg_Field = "crim_srno";
@@ -530,7 +542,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 39:
+                                case 41:
                                     insertString = "insert into " + prefixTempDB + "t5012_criknowns (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5012_criknowns";
                                     respective_Reg_Field = "crim_srno";
@@ -538,7 +550,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 40:
+                                case 42:
                                     insertString = "insert into " + prefixTempDB + "t5023_operationarea (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5023_operationarea";
                                     respective_Reg_Field = "crim_srno";
@@ -546,7 +558,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 41:
+                                case 43:
                                     insertString = "insert into " + prefixTempDB + "t5021_general (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5021_general";
                                     respective_Reg_Field = "crim_srno";
@@ -554,7 +566,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 42:
+                                case 44:
                                     insertString = "insert into " + prefixTempDB + "t5022_affiliation (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5022_affiliation";
                                     respective_Reg_Field = "crim_srno";
@@ -562,7 +574,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 43:
+                                case 45:
                                     insertString = "insert into " + prefixTempDB + "t5026_employment (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5026_employment";
                                     respective_Reg_Field = "empl_sr";
@@ -570,7 +582,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 44:
+                                case 46:
                                     insertString = "insert into " + prefixTempDB + "t5025_political (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5025_political";
                                     respective_Reg_Field = "politic_sr";
@@ -578,7 +590,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 45:
+                                case 47:
                                     insertString = "insert into " + prefixTempDB + "t5024_notices (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5024_notices";
                                     respective_Reg_Field = "notice_sr";
@@ -586,7 +598,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 46:
+                                case 48:
                                     insertString = "insert into " + prefixTempDB + "t503_gang (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t503_gang";
                                     respective_Reg_Field = "gang_code";
@@ -594,7 +606,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 47:
+                                case 49:
                                     insertString = "insert into " + prefixTempDB + "t5037_frontalorg (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5037_frontalorg";
                                     respective_Reg_Field = "gang_code";
@@ -602,7 +614,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 48:
+                                case 50:
                                     insertString = "insert into " + prefixTempDB + "t5032_support (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5032_support";
                                     respective_Reg_Field = "gang_code";
@@ -610,7 +622,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 49:
+                                case 51:
                                     insertString = "insert into " + prefixTempDB + "t5034_transport (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5034_transport";
                                     respective_Reg_Field = "gang_code";
@@ -618,7 +630,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 50:
+                                case 52:
                                     insertString = "insert into " + prefixTempDB + "t5033_holdings (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5033_holdings";
                                     respective_Reg_Field = "gang_code";
@@ -626,7 +638,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 51:
+                                case 53:
                                     insertString = "insert into " + prefixTempDB + "t5035_training (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5035_training";
                                     respective_Reg_Field = "gang_code";
@@ -634,7 +646,7 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                                case 52:
+                                case 54:
                                     insertString = "insert into " + prefixTempDB + "t5036_hideouts (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
                                     insertingTable = "t5036_hideouts";
                                     respective_Reg_Field = "gang_code";
@@ -642,14 +654,97 @@ public class MigrateData {
                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
                                     break;
-                            }
+                               
+                                case 55:
+                                    insertString = "insert into " + prefixTempDB + "t099_generaldiary (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t099_generaldiary";
+                                    respective_Reg_Field = "gd_srno";
+//                                    System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                
+                                case 56:
+                                    insertString = "insert into " + prefixTempDB + "t3_caseprogress (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t3_caseprogress";
+                                    respective_Reg_Field = "regn_srno";
+//                                   System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                    
+                                  
+                     
+                                 case 57:
+                                    insertString = "insert into " + prefixTempDB + "t304b_seizure (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                    insertingTable = "t304b_seizure";
+                                    respective_Reg_Field = "regn_srno";
+//                                  //System.out.println(insertString);
+                                    pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                    insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                    break;
+                                    
+                                 case 58:
+                                     insertString = "insert into " + prefixTempDB + "t2012_properties (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                     insertingTable = "t2012_properties";
+                                     respective_Reg_Field = "regn_srno";
+                                     //System.out.println(insertString);
+                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                     break;
+                                     
+                                 case 59:
+                                     insertString = "insert into " + prefixTempDB + "t015_psstaffold (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                     insertingTable = "t015_psstaffold";
+                                     respective_Reg_Field = "pis_code";
+                                     //System.out.println(insertString);
+                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                     break;
+                                     
+                                 case 60:
+                                     insertString = "insert into " + prefixTempDB + "t011_state (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                     insertingTable = "t011_state";
+                                     respective_Reg_Field = "state_code";
+                                     //System.out.println(insertString);
+                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                     break;
+                                     
+                                 case 61:
+                                     insertString = "insert into " + prefixTempDB + "t012_district (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                     insertingTable = "t012_district";
+                                     respective_Reg_Field = "district_code";
+                                     //System.out.println(insertString);
+                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                     break;
+                                     
+                                 case 62:
+                                     insertString = "insert into " + prefixTempDB + "t013_policestation (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+                                     insertingTable = "t013_policestation";
+                                     respective_Reg_Field = "ps_code";
+                                     //System.out.println(insertString);
+                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
+                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
+                                     break;
+                                     
+//                                 case 63:
+//                                     insertString = "insert into " + prefixTempDB + "t5013_cristatus (" + buffterMeta.toString() + ") values (" + buffterValue.toString() + ")";
+//                                     insertingTable = "t5013_cristatus";
+//                                     respective_Reg_Field = "crim_srno";
+//                                     //System.out.println(insertString);
+//                                     pstmtInsert = connectionTarget.prepareStatement(insertString);
+//                                     insertCounter = insertCounter + pstmtInsert.executeUpdate();
+//                                     break;
+                           }
 
                             insertingTables[jk] = insertingTable
                                     + ":" + recordsFound[jk];//+ ":" + recordsInserted[jk];
 
                         } catch (Exception ee) {
 //                            ee.printStackTrace();
-                            logger.log(CctnsLogger.ERROR, ee.getMessage());
+                            logger.log(CctnsLogger.ERROR, ee); System.out.println(ee.toString());
                             //--------------------------------------------------
                             try {
                                 String eReason;
@@ -664,25 +759,24 @@ public class MigrateData {
 //                                System.out.println(insertString);
                                 pstmtInsert = connectionTarget.prepareStatement(insertString);
                                 pstmtInsert.executeUpdate();
-                                 buffterMeta.delete(0, buffterMeta.length());
                             } catch (Exception ex) {
 //                                ex.printStackTrace();
-                                logger.log(CctnsLogger.ERROR, ex);
+                                logger.log(CctnsLogger.ERROR, ex);System.out.println(ex.toString());
                             }
+                            //break lbl_Next_Statement;
                             //--------------------------------------------------
                         }
                     }
                     recordsInserted[jk] = insertCounter;
-                    if(insertingTables[jk]!=null && !"".equals(insertingTables[jk]))
-                    {
-                       insertingTables[jk] = insertingTables[jk].toString().trim() + ":" + recordsInserted[jk]; 
-                    }
-                    
-//                    //..................................................................        
+                    System.out.println("Processed table "+(jk+1)+" of 63 : "+insertingTables[jk]+": "+recordsInserted[jk]+" records inserted ..");
+                    insertingTables[jk] = insertingTables[jk].toString().trim() + ":" + recordsInserted[jk];                    
+                }
+                else
+                {
+                    System.out.println("No data for table "+(jk+1)+" of 63");
                 }
             } catch (Exception ex) {
-                ex.printStackTrace();
-                logger.log(CctnsLogger.ERROR, ex);
+                logger.log(CctnsLogger.ERROR, ex);System.out.println(ex.toString());
 //                ex.printStackTrace();
             }
         }
@@ -813,6 +907,7 @@ public class MigrateData {
         String sOut7 = string;
         String sOut8 = string;
         String sOut9 = string;
+        String sOut10 = string;
 
         if (string.contains("'")) {
             sOut1 = string.replaceAll("'", "''");
@@ -868,6 +963,12 @@ public class MigrateData {
             sOut9 = sOut8;
         }
 
-        return sOut9;
+        if (sOut9.contains("\\")) {
+            sOut10 = sOut9.replaceAll("\\\\", "\\\\\\\\");
+        } else {
+            sOut10 = sOut9;
+        }
+        
+        return sOut10;
     }
 }

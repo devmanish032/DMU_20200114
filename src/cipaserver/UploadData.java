@@ -73,9 +73,8 @@ public class UploadData {
 
     public String[] executeUploadBlock(String fileName) throws FileNotFoundException, IOException, SQLException {
         FileInputStream fstream = new FileInputStream(fileName);
-        DataInputStream in = new DataInputStream( fstream);
-        //BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        BufferedReader br = new BufferedReader(new InputStreamReader(in,"UTF8"));
+        DataInputStream in = new DataInputStream(fstream);
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
         String strLine;
 
         java.sql.DatabaseMetaData dmd = null;
@@ -113,7 +112,7 @@ public class UploadData {
                 String str = null;
                 if ((dmd.getDatabaseProductName().toString()).contains("Microsoft".toString())) {
                     str = strLine.replace("CIPATemp_DB.", "CIPATemp_DB.dbo.");
-                    //System.out.println(str);
+//                    System.out.println(str);
                     pstmtSP = connectionTarget.prepareStatement(str);
                     i = pstmtSP.executeUpdate();
 //                    System.out.println(i + " row inserted");

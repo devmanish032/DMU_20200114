@@ -7,8 +7,6 @@ package cipaserver;
 import com.microsoft.sqlserver.jdbc.SQLServerCallableStatement;
 import com.mysql.jdbc.CallableStatement;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -18,7 +16,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Properties;
 import logger.CctnsLogger;
 
 /**
@@ -50,8 +47,6 @@ public class ProcessSP {
 //    String checkSumCPstring[] = null;
     String insertingTablesCount[] = new String[52];
     private static CctnsLogger logger = CctnsLogger.getInstance(DeleteData.class.getName());
-    
-    private String checkSumEnabled="false";
 
     public ProcessSP() {
         java.sql.DatabaseMetaData dmd = null;
@@ -189,6 +184,7 @@ public class ProcessSP {
                         + "ps_cd = '" + keyPS.trim() + "' and "
                         + "YEAR_MON = '" + rangeYYYYMM.get(i).toString() + "' and "
                         + "batch_status='S'";
+                
 //                System.out.println(checkString);
                 try {
                     pstmtCheck = connectionTarget.prepareStatement(checkString[i]);
@@ -371,7 +367,7 @@ public class ProcessSP {
                         SQLServerCallableStatement scs = (SQLServerCallableStatement) connectionTarget.prepareCall("{call " + prefixStagging + "Sp_Rollback_Data(?)}");
                         scs.setString(1, statusR.get(i).toString());
                         boolean bl = scs.execute();
-//                    System.out.println("Stored Procedure Run : " + bl);
+                    System.out.println("Stored Procedure Run : " + bl);
                         scs.close();
                     } catch (Exception e) {
                         logger.log(CctnsLogger.ERROR, e);
@@ -398,7 +394,7 @@ public class ProcessSP {
 
     }
 
-  //==============================================================================
+//==============================================================================
     public void SP_from_CIPAtempDB_TO_Stagging(String batchCD, String insertingTables[]) {
         try {
 //            System.out.println("calling SP_from_CIPAtempDB_TO_Stagging");
@@ -408,13 +404,23 @@ public class ProcessSP {
             java.sql.DatabaseMetaData dm = null;
             dm = connectionTarget.getMetaData();
             if (!(dm.getDatabaseProductName().toString()).contains("Microsoft".toString()))
-           {
+            {
                 System.out.println("Calling procedure 1/12 : " + prefixStagging + "SP_Load_CIPA_Data('"+batchCD+"')");
 //                CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_Load_CIPA_Data(?)}");
 //                cs.setString(1, batchCD);
 //                cs.execute();
-           try  {
-                    System.out.println("Calling procedure 2/12 : " + prefixStagging + "SP_CIPA_IIF_1('"+batchCD+"')");
+                
+                try {
+                    System.out.println("Calling procedure 2/12 : " + prefixStagging + "SP_CIPA_STAFF_INFO('"+batchCD+"')");
+                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_STAFF_INFO(?)}");
+                    cs.setString(1, batchCD);
+                    cs.execute();
+                } catch (SQLException se) {
+                    System.out.println("Error in SP_CIPA_STAFF_INFO: "+se.toString());
+                }
+                
+            try {
+                    System.out.println("Calling procedure 3/12 : " + prefixStagging + "SP_CIPA_IIF_1('"+batchCD+"')");
                     CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_1(?)}");
                     cs.setString(1, batchCD);
                     cs.execute();
@@ -423,7 +429,7 @@ public class ProcessSP {
                 }
             
             try { 
-                    System.out.println("Calling procedure 3/12 : " + prefixStagging + "SP_CIPA_IIF_2('"+batchCD+"')");
+                    System.out.println("Calling procedure 4/12 : " + prefixStagging + "SP_CIPA_IIF_2('"+batchCD+"')");
                     CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_2(?)}");
                     cs.setString(1, batchCD);
                     cs.execute();
@@ -432,16 +438,24 @@ public class ProcessSP {
                 }
    
             try { 
-                    System.out.println("Calling procedure 4/12 : " + prefixStagging + "SP_CIPA_IIF_3('"+batchCD+"')");
+                    System.out.println("Calling procedure 5/12 : " + prefixStagging + "SP_CIPA_IIF_3('"+batchCD+"')");
                     CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_3(?)}");
                     cs.setString(1, batchCD);
                     cs.execute();
                 } catch (SQLException se) {
                     System.out.println("Error in SP_CIPA_IIF_3: "+se.toString());
                 }
+            try { 
+                System.out.println("Calling procedure 6/12 : " + prefixStagging + "SP_CIPA_IIF_4('"+batchCD+"')");
+                CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_4(?)}");
+                cs.setString(1, batchCD);
+                cs.execute();
+            } catch (SQLException se) {
+                System.out.println("Error in SP_CIPA_IIF_4: "+se.toString());
+            }
    
             try { 
-                    System.out.println("Calling procedure 5/12 : " + prefixStagging + "SP_CIPA_IIF_5('"+batchCD+"')");
+                    System.out.println("Calling procedure 7/12 : " + prefixStagging + "SP_CIPA_IIF_5('"+batchCD+"')");
                     CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_5(?)}");
                     cs.setString(1, batchCD);
                     cs.execute();
@@ -450,7 +464,7 @@ public class ProcessSP {
                 }
             //comment by nitin
           try { 
-                    System.out.println("Calling procedure 6/12 : " + prefixStagging + "SP_CIPA_IIF_6('"+batchCD+"')");
+                    System.out.println("Calling procedure 8/12 : " + prefixStagging + "SP_CIPA_IIF_6('"+batchCD+"')");
                     CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_6(?)}");
                     cs.setString(1, batchCD);
                     cs.execute();
@@ -458,60 +472,62 @@ public class ProcessSP {
                     System.out.println("Error in SP_CIPA_IIF_6: "+se.toString());
                 }
    
-           try { 
-                    System.out.println("Calling procedure 7/12 : " + prefixStagging + "SP_CIPA_IIF_8('"+batchCD+"')");
-                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_8(?)}");
-                    cs.setString(1, batchCD);
-                    cs.execute();
-                } catch (SQLException se) {
-                    System.out.println("Error in SP_CIPA_IIF_8: "+se.toString());
-                }
-   
-               try { 
-                   System.out.println("Calling procedure 8/12 : " + prefixStagging + "SP_CIPA_IIF_9('"+batchCD+"')");
-                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_9(?)}");
-                    cs.setString(1, batchCD);
-                    cs.execute();
-                } catch (SQLException se) {
-                    System.out.println("Error in SP_CIPA_IIF_9: "+se.toString());
-                }
-   
-                try { 
-                    System.out.println("Calling procedure 9/12 : " + prefixStagging + "SP_CIPA_MLC('"+batchCD+"')");
-                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_MLC(?)}");
-                    cs.setString(1, batchCD);
-                    cs.execute();
-                } catch (SQLException se) {
-                    System.out.println("Error in SP_CIPA_MLC: "+se.toString());
-                }
-   
-
-   
-                try { 
-                        System.out.println("Calling procedure 10/12 :" + prefixStagging + "SP_CIPA_NCR('"+batchCD+"')");
-                        CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_NCR(?)}");
-                        cs.setString(1, batchCD);
-                        cs.execute();
-                } catch (SQLException se) {
-                    System.out.println("Error in SP_CIPA_NCR: "+se.toString());
-                }
-                
-                try { 
-                    System.out.println("Calling procedure 11/12 :" + prefixStagging + "SP_CIPA_CRIMINAL_PROFILE('"+batchCD+"')");
-                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_CRIMINAL_PROFILE(?)}");
-                    cs.setString(1, batchCD);
-                    cs.execute();
-                } catch (SQLException se) {
-                    System.out.println("Error in SP_CIPA_CRIMINAL_PROFILE: "+se.toString());
-                }
+//           try { 
+//                    System.out.println("Calling procedure 7/12 : " + prefixStagging + "SP_CIPA_IIF_8('"+batchCD+"')");
+//                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_8(?)}");
+//                    cs.setString(1, batchCD);
+//                    cs.execute();
+//                } catch (SQLException se) {
+//                    System.out.println("Error in SP_CIPA_IIF_8: "+se.toString());
+//                }
+//   
+//               try { 
+//                   System.out.println("Calling procedure 8/12 : " + prefixStagging + "SP_CIPA_IIF_9('"+batchCD+"')");
+//                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_IIF_9(?)}");
+//                    cs.setString(1, batchCD);
+//                    cs.execute();
+//                } catch (SQLException se) {
+//                    System.out.println("Error in SP_CIPA_IIF_9: "+se.toString());
+//                }
+//   
+//                try { 
+//                    System.out.println("Calling procedure 9/12 : " + prefixStagging + "SP_CIPA_MLC('"+batchCD+"')");
+//                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_MLC(?)}");
+//                    cs.setString(1, batchCD);
+//                    cs.execute();
+//                } catch (SQLException se) {
+//                    System.out.println("Error in SP_CIPA_MLC: "+se.toString());
+//                }
+//   
+//
+//   
+//                try { 
+//                        System.out.println("Calling procedure 10/12 :" + prefixStagging + "SP_CIPA_NCR('"+batchCD+"')");
+//                        CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_NCR(?)}");
+//                        cs.setString(1, batchCD);
+//                        cs.execute();
+//                } catch (SQLException se) {
+//                    System.out.println("Error in SP_CIPA_NCR: "+se.toString());
+//                }
+//                
+//                try { 
+//                    System.out.println("Calling procedure 11/12 :" + prefixStagging + "SP_CIPA_CRIMINAL_PROFILE('"+batchCD+"')");
+//                    CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_CRIMINAL_PROFILE(?)}");
+//                    cs.setString(1, batchCD);
+//                    cs.execute();
+//                } catch (SQLException se) {
+//                    System.out.println("Error in SP_CIPA_CRIMINAL_PROFILE: "+se.toString());
+//                }
                try { 
                     System.out.println("Calling procedure 12/12 :" + prefixStagging + "SP_CIPA_GD_DETAILS('"+batchCD+"')");
                     CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{ call " + prefixStagging + "SP_CIPA_GD_DETAILS(?)}");
                     cs.setString(1, batchCD);
                     cs.execute();
-               } catch (SQLException se) {
+                } catch (SQLException se) {
                     System.out.println("Error in SP_CIPA_GD_DETAILS: "+se.toString());
                 }
+                             
+               
             } else {//System.out.println("SQL Server");
                 SQLServerCallableStatement scs = (SQLServerCallableStatement) connectionTarget.prepareCall("{call " + prefixStagging + "SP_Load_CIPA_Data(?)}");
                 scs.setString(1, batchCD);
@@ -522,8 +538,6 @@ public class ProcessSP {
             logger.log(CctnsLogger.ERROR, e); 
             System.out.println("Error: "+e.toString());//            e.printStackTrace();        //marked
         }
-        //=========================================
-
         //=========================================
         supressedRecords = new int[insertingTables.length];
         for (int i = 0; i < insertingTables.length; i++) {
@@ -543,8 +557,8 @@ public class ProcessSP {
                         insertingTables[i] = insertingTables + ":0";
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
-//            logger.log(CctnsLogger.ERROR, e);
+//                    e.printStackTrace();
+            logger.log(CctnsLogger.ERROR, e);
                 }
             }
         }
@@ -561,6 +575,7 @@ public class ProcessSP {
         String callAllStoredProcedures = "select load_proc_name, "
                 + "stagging_table,transaction_table,rejection_table "
                 + "from " + prefixStagging + "proc_table_mapping "
+                + "where record_status <>'D' "
                 + "order by FORM_NUMBER, RUN_ORDER";
         try {
             pstmtAllStoredProcedures = connectionTarget.prepareStatement(callAllStoredProcedures);
@@ -594,14 +609,14 @@ public class ProcessSP {
                 if (!(dm.getDatabaseProductName().toString()).contains("Microsoft".toString())) {//System.out.println("MySql");
                     CallableStatement cs = null;
                     try {
-//                        System.out.println("Calling mysql :" + staggingSP[exe]);
+                        System.out.println("Calling stored procedure "+(exe+1)+" of "+ (staggingSP.length+1) +" : " +prefixStagging+ staggingSP[exe]+"('"+batchCD+"',1)");
                         cs = (CallableStatement) connectionTarget.prepareCall("{call " + prefixStagging + "" + staggingSP[exe].toString().toLowerCase() + "(?,?)}");
                         cs.setString(1, batchCD);
                         cs.setInt(2, 1);
                         cs.execute();
                     } catch (Exception e) {
-                        logger.log(CctnsLogger.ERROR, "{call " + prefixStagging + "" + staggingSP[exe].toString().toLowerCase() + "("+batchCD+ "  ,1  )}  Error details: " +e);
-//                        e.printStackTrace();
+                        logger.log(CctnsLogger.ERROR, e);//                        e.printStackTrace();
+                        System.out.println(e.toString());
                     } finally {
 //                        System.out.println(lenght++);
                         cs.clearParameters();
@@ -616,7 +631,7 @@ public class ProcessSP {
                         scs.execute();
                         scs.close();
                     } catch (Exception e) {
-                        logger.log(CctnsLogger.ERROR, "{call " + prefixStagging + "" + staggingSP[exe].toString().trim() + "("+batchCD+ " )}  Error details: "+e);
+                        logger.log(CctnsLogger.ERROR, e);
                         e.printStackTrace();    //marked
                     }
                 }
@@ -808,7 +823,7 @@ public class ProcessSP {
 
 //==============================================================================
     public String[] Tables_Record_Count() {
-        String tableNames[] = new String[53];
+        String tableNames[] = new String[61];
 
         tableNames[0] = "t015_psstaffcurr";
         tableNames[1] = "t014_policestationbeat";
@@ -863,8 +878,17 @@ public class ProcessSP {
         tableNames[50] = "t5033_holdings";
         tableNames[51] = "t5035_training";
         tableNames[52] = "t5036_hideouts";
+        tableNames[53] = "t099_generaldiary";
+        tableNames[54] = "t3_caseprogress";
+        tableNames[55] = "t304b_seizure";
+        tableNames[56] = "t2012_properties";
+        tableNames[57] = "t015_psstaffold";
+        tableNames[58] = "t011_state";
+        tableNames[59] = "t012_district";
+        tableNames[60] = "t013_policestation";
+//        tableNames[61] = "t5013_cristatus";
 
-        String strSelect[] = new String[53];
+        String strSelect[] = new String[61];
         strSelect[0] = "select count(*) from " + prefixTempDB + "t015_psstaffcurr".toLowerCase();
         strSelect[1] = "select count(*) from " + prefixTempDB + "t014_policestationbeat".toLowerCase();
         strSelect[2] = "select count(*) from " + prefixTempDB + "t1_registration".toLowerCase();
@@ -918,8 +942,17 @@ public class ProcessSP {
         strSelect[50] = "select count(*) from " + prefixTempDB + "t5033_holdings".toLowerCase();
         strSelect[51] = "select count(*) from " + prefixTempDB + "t5035_training".toLowerCase();
         strSelect[52] = "select count(*) from " + prefixTempDB + "t5036_hideouts".toLowerCase();
+        strSelect[53] = "select count(*) from " + prefixTempDB + "t099_generaldiary".toLowerCase();
+        strSelect[54] = "select count(*) from " + prefixTempDB + "t3_caseprogress".toLowerCase();
+        strSelect[55] = "select count(*) from " + prefixTempDB + "t304b_seizure".toLowerCase();
+        strSelect[56] = "select count(*) from " + prefixTempDB + "t2012_properties".toLowerCase();
+        strSelect[57] = "select count(*) from " + prefixTempDB + "t015_psstaffold".toLowerCase();
+        strSelect[58] = "select count(*) from " + prefixTempDB + "t011_state".toLowerCase();
+        strSelect[59] = "select count(*) from " + prefixTempDB + "t012_district".toLowerCase();
+        strSelect[60] = "select count(*) from " + prefixTempDB + "t013_policestation".toLowerCase();
+//        strSelect[61] = "select count(*) from " + prefixTempDB + "t5013_cristatus".toLowerCase();
 
-
+        System.out.println(strSelect[61].toString());
         PreparedStatement pstmtSelect;
 //        sourceORtarget = "target";
 //        SQLConnection sqlcon = new SQLConnection();
@@ -927,7 +960,7 @@ public class ProcessSP {
 
         for (int ij = 0; ij < strSelect.length; ij++) {
             try {
-//                System.out.println(strSelect[ij].toString());
+                System.out.println(strSelect[ij].toString());
                 pstmtSelect = connectionTarget.prepareStatement(strSelect[ij].toString());
                 ResultSet rset = pstmtSelect.executeQuery();
                 rset.next();
@@ -1023,14 +1056,14 @@ public class ProcessSP {
         String insertingTables[] = new String[str.length];
         int recordsFound[] = new int[str.length];
         int recordsInserted[] = new int[str.length];
-        ArrayList<String> mString = new ArrayList<String>();
+        String mString[] = new String[86];
         ;
 
         String temp;
         for (int i = 0; i < str.length; i++) {
 //            System.out.println("str[i]" + str[i]);
             if (str[i] != null) {
-                //System.out.println("str[" + i + "]" + str[i]);
+                System.out.println("str[" + i + "]" + str[i]);
                 int colon1 = str[i].trim().indexOf(':');
                 int colon2 = str[i].trim().indexOf(':', colon1 + 1);
 //                System.out.println("colon1--"+colon1);
@@ -1041,7 +1074,7 @@ public class ProcessSP {
                 recordsFound[i] = Integer.parseInt(temp);
                 temp = str[i].substring(colon2 + 1, str[i].length());
                 recordsInserted[i] = Integer.parseInt(temp);
-                //System.out.println(insertingTables[i] + "=" + recordsFound[i] + "=" + recordsInserted[i]);
+                System.out.println(insertingTables[i] + "=" + recordsFound[i] + "=" + recordsInserted[i]);
             }
         }
 
@@ -1054,7 +1087,7 @@ public class ProcessSP {
             java.sql.DatabaseMetaData dm = null;
             dm = connectionTarget.getMetaData();
 //            ArrayList rangeYYYYMM = rangeOfSelectedYYYYMM();
-            if (!(dm.getDatabaseProductName().toString()).contains("Microsoft".toString())) {//System.out.println("MySql");
+            if (!(dm.getDatabaseProductName().toString()).contains("Windows".toString())) {//System.out.println("MySql");
                 CallableStatement cs = (CallableStatement) connectionTarget.prepareCall("{call " + prefixStagging + "sp_table_record_count" + "(?)}");
                 cs.setString(1, batchCD);
 //                cs.setInt(2, 1);
@@ -1411,6 +1444,7 @@ public class ProcessSP {
                 //========================================
                 String mappingString = "select stagging_table,transaction_table,rejection_table "
                         + "from " + prefixStagging + "proc_table_mapping "
+                        + "where record_status<>'D' "
                         + "order by FORM_NUMBER, RUN_ORDER";
                 PreparedStatement pstmtMapping;
                 pstmtMapping = connectionTarget.prepareStatement(mappingString);
@@ -1421,9 +1455,7 @@ public class ProcessSP {
 
                 while (rsetMapping.next()) {
 //                    if (!rsetMapping.getString(2).contains("t_person")) {
-                   
-                    mString.add(k ,rsetMapping.getString(1) + ":" + rsetMapping.getString(2) + ":" + rsetMapping.getString(3));
-                    
+                    mString[k] = rsetMapping.getString(1) + ":" + rsetMapping.getString(2) + ":" + rsetMapping.getString(3);
                     k++;
 //                    }
 //                    System.out.println(mString[k] + ":" + k);
@@ -1438,7 +1470,7 @@ public class ProcessSP {
 
             try {
                 File tofolder = new File(System.getProperty("user.dir"));
-//                System.out.println(tofolder);System.getProperty("user.dir")
+//                System.out.println(tofolder);
                 File logFolder = new File(tofolder + "/Logs");
 
                 if (!logFolder.exists()) {
@@ -1463,20 +1495,14 @@ public class ProcessSP {
                 out.println("Table Name             Records in Source            Records in Landing         Unused Records");
                 out.println("---------------------------------------------------------------------------------------------");
                 ArrayList cStringAL = new ArrayList();
-                if(cString!=null){
-                    
-                
                 for (int jj = 0; jj < cString.length; jj++) {
                     cStringAL.add(jj, cString[jj].substring(0, cString[jj].indexOf(":")).toString().toLowerCase().trim());
-                    //System.out.println("cStringAL[jj]" + cStringAL.get(jj) + ":");
-                }}
-                if(insertingTables!=null)
-                {
-                    
-                                for (int i = 1; i < insertingTables.length; i++) {
+                    System.out.println("cStringAL[jj]" + cStringAL.get(jj) + ":");
+                }
+                for (int i = 1; i < insertingTables.length; i++) {
 //                    System.out.println(insertingTables[i] + "------------------>>>>>>>");
 //                    String temp1 = insertingTables[i].substring(0, insertingTables[i].indexOf(":"));
-                    //System.out.println(insertingTables[i] + ":" + cStringAL.contains(insertingTables[i]));
+                    System.out.println(insertingTables[i] + ":" + cStringAL.contains(insertingTables[i]));
                     if (insertingTables[i] != null && cStringAL.contains(insertingTables[i])) {
                         if (insertingTables[i].equalsIgnoreCase("t015_psstaffcurr") || insertingTables[i].equalsIgnoreCase("t014_policestationbeat")
                                 || insertingTables[i].equalsIgnoreCase("t1_registration") || insertingTables[i].equalsIgnoreCase("t1021_Personal")) {
@@ -1498,7 +1524,7 @@ public class ProcessSP {
                         }
                     }
                 }
-            }
+
                 out.println("=============================================================================================");
                 out.println();
                 out.println();
@@ -1554,9 +1580,6 @@ public class ProcessSP {
                 out.println("=============================================================================================================");
                 out.println("Source Table Name         Source Record Count     Target Table Name                    Target Record Count");
                 out.println("-------------------------------------------------------------------------------------------------------------");
-                if(cString!=null){
-                    
-                
                 for (int i = 0; i < cString.length; i++) {
 //                    System.out.println(cString[i]);
                     String tempo[] = new String[4];
@@ -1575,13 +1598,12 @@ public class ProcessSP {
                     }
                     out.println(tempo[3].trim());
                 }
-            }
                 out.println("=============================================================================================================");
                 //NEW END=======================================================
                 int j;
                 out.println("\n\n");
-                for (int i = 0; i < mString.size(); i++) {
-                    String[] sTableName = mString.get(i).split(":");
+                for (int i = 0; i < mString.length; i++) {
+                    String[] sTableName = mString[i].split(":");
                     out.println("FOR STAGGING TABLE - " + sTableName[0].toUpperCase());
                     out.println("===========================================================================================================");
                     String sErrorcount = "1000";
@@ -1649,10 +1671,7 @@ public class ProcessSP {
                     out.println("-----------------------------------------------------------------------------------------------------------");
                     out.println();
                 }
-                 CheckSumEnabled();
-                 System.out.println("checkSumEnabled...>"+checkSumEnabled);
-                 if(checkSumEnabled.equalsIgnoreCase("true"))
-                 {
+
                 //--checksum fir-------------------------------------------------
                 if (checkSumFIRstring != null) {
                     out.println("FIR Checksum Details");
@@ -1795,7 +1814,6 @@ public class ProcessSP {
                     }
                     out.println("========================================================================================================================");
                 }
-                 }
                 //--------------------------------------------------------------
                 //--checksum fir-------------------------------------------------
 //                if (checkSumCPstring != null) {
@@ -1837,22 +1855,4 @@ public class ProcessSP {
 //            ee.printStackTrace();
         }
     }
-    
-    private void CheckSumEnabled()
-    {
-             Properties props = new Properties();
-             File tofolder = new File(System.getProperty("user.dir"));
-              System.out.println("Folder .func..>"+tofolder);
-             File propFile = new File(tofolder + "/config.properties");
-              FileInputStream fileIn;
-              try {
-                 fileIn = new FileInputStream(propFile);
-                  props.load(fileIn);
-                  checkSumEnabled= props.getProperty("isCheckSumEnable");
-                  System.out.println("checkSumEnabled.func..>"+checkSumEnabled);
-            }   catch (IOException ex) {
-               logger.log(CctnsLogger.ERROR, ex);
-            }          
-    } 
-    
 }
